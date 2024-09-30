@@ -1,6 +1,6 @@
 {
-    "name": "wemx/sso-pterodactyl",
-    "description": "Allows clients from WemX login to their Pterodactyl account with a single redirect",
+    "name": "fernandomema/sso-pelican",
+    "description": "Allows clients from WemX login to their pelican account with a single redirect",
     "type": "library",
     "license": "MIT",
     "authors": [
