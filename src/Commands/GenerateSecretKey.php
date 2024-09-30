@@ -4,7 +4,7 @@ namespace WemX\Sso\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Console\Kernel;
-use Pterodactyl\Traits\Commands\EnvironmentWriterTrait;
+use App\Traits\EnvironmentWriterTrait;
 use Illuminate\Support\Str;
 
 class GenerateSecretKey extends Command
