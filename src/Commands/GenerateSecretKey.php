@@ -26,7 +26,7 @@ class GenerateSecretKey extends Command
     /**
      * Handle command execution.
      *
-     * @throws \Pterodactyl\Exceptions\PterodactylException
+     * @throws \App\Exceptions\PanelException
      */
     public function handle(): int
     {

@@ -4,7 +4,7 @@ namespace WemX\Sso\Http\Controllers;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
-use Pterodactyl\Models\User;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
