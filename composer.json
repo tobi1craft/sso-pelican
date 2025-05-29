@@ -1,19 +1,19 @@
 {
-    "name": "fernandomema/sso-pelican",
-    "description": "Allows clients from WemX login to their pelican account with a single redirect",
+    "name": "tobi1craft/sso-pelican",
+    "description": "Allows clients login to their pelican account with a single redirect",
     "type": "library",
     "license": "MIT",
     "authors": [
         {
-            "name": "Mubeen Ullah",
-            "email": "mubeen@wemx.net"
+            "name": "tobi1craft",
+            "email": "tobi1craft.mc@gmail.com"
         }
     ],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
         "php": "^7.3|^8.0",
-        "illuminate/support": "^9.0|^10.0|^11.0"
+        "illuminate/support": "^9.0|^10.0|^11.0|^12.0"
     },
     "autoload": {
         "psr-4": {
