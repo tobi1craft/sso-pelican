@@ -23,9 +23,14 @@ class SsoController
         }
 
         try {
-            Auth::loginUsingId($this->getToken($token));
+            $id = $this->getToken($token);
+            $user = User::findOrFail($id);
+            Auth::loginUsingId($id);
             $this->invalidateToken($token);
 
+            if($user->isAdmin()) {
+                return redirect()->intended('/admin');
+            }
             return redirect()->intended('/');
         } catch(\Exception $error) {
             return redirect()->back()->withError('Something went wrong, please try again.');
