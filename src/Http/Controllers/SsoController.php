@@ -48,9 +48,6 @@ class SsoController
         }
 
         $user = User::findOrFail($request->input('user_id'));
-        if($user['root_admin']) {
-            return response(['success' => false, 'message' => 'You cannot automatically login to admin accounts.'], 501);
-        }
 
         if($user['2fa']) {
             return response(['success' => false, 'message' => 'Logging into accounts with 2 Factor Authentication enabled is not supported.'], 501);
