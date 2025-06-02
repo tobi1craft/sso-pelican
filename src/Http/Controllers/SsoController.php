@@ -1,6 +1,6 @@
 <?php
 
-namespace WemX\Sso\Http\Controllers;
+namespace Tobi1craft\Sso\Http\Controllers;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-class SsoController 
+class SsoController
 {
 
     /**
@@ -18,7 +18,7 @@ class SsoController
      */
     public function handle($token)
     {
-        if(!$this->hasToken($token)) {
+        if (!$this->hasToken($token)) {
             return redirect()->back()->withError('Token does not exists or has expired');
         }
 
@@ -28,11 +28,11 @@ class SsoController
             Auth::loginUsingId($id);
             $this->invalidateToken($token);
 
-            if($user->isAdmin()) {
+            if ($user->isAdmin()) {
                 return redirect()->intended('/admin');
             }
             return redirect()->intended('/');
-        } catch(\Exception $error) {
+        } catch (\Exception $error) {
             return redirect()->back()->withError('Something went wrong, please try again.');
         }
     }
@@ -44,21 +44,21 @@ class SsoController
      */
     public function webhook(Request $request)
     {
-        if(!config('sso-wemx.secret')) {
+        if (!env('SSO_SECRET')) {
             return response(['success' => false, 'message' => 'Please configure a SSO Secret'], 403);
         }
 
-        if($request->input('sso_secret') !== config('sso-wemx.secret')) {
+        if ($request->input('sso_secret') !== env('SSO_SECRET')) {
             return response(['success' => false, 'message' => 'Please provide valid credentials'], 403);
         }
 
         $user = User::findOrFail($request->input('user_id'));
 
-        if($user['2fa']) {
+        if ($user['2fa']) {
             return response(['success' => false, 'message' => 'Logging into accounts with 2 Factor Authentication enabled is not supported.'], 501);
         }
 
-        return response(['success' => true, 'redirect' => route('sso-wemx.login', $this->generateToken($request->input('user_id')))], 200);
+        return response(['success' => true, 'redirect' => route('sso-tobi1craft.login', $this->generateToken($request->input('user_id')))], 200);
     }
 
     /**
@@ -69,8 +69,8 @@ class SsoController
      */
     protected function generateToken($user_id)
     {
-        $token = Str::random(config('sso-wemx.token.length', 48));
-        Cache::add($token, $user_id, config('sso-wemx.token.lifetime', 60));
+        $token = Str::random(48);
+        Cache::add($token, $user_id, 60); // Store the token for 60 seconds
         return $token;
     }
 

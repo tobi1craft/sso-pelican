@@ -26,7 +26,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "WemX\\Sso\\": "src/"
+            "Tobi1craft\\Sso\\": "src/"
         }
     },
     "autoload-dev": {
@@ -37,7 +37,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "WemX\\Sso\\SsoServiceProvider"
+                "Tobi1craft\\Sso\\SsoServiceProvider"
             ]
         }
     }

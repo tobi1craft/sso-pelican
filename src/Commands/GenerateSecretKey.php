@@ -1,9 +1,8 @@
 <?php
 
-namespace WemX\Sso\Commands;
+namespace Tobi1craft\Sso\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Console\Kernel;
 use App\Traits\EnvironmentWriterTrait;
 use Illuminate\Support\Str;
 
@@ -11,9 +10,9 @@ class GenerateSecretKey extends Command
 {
     use EnvironmentWriterTrait;
 
-    protected $description = 'Generate new SSO secret key for WemX';
+    protected $description = 'Generate new SSO secret key';
 
-    protected $signature = 'wemx:generate';
+    protected $signature = 'sso:generate';
 
     /**
      * GenerateSecretKey constructor.
@@ -31,7 +30,7 @@ class GenerateSecretKey extends Command
     public function handle(): int
     {
         $secret_key = $this->generate();
-        $this->writeToEnvironment(['WEMX_SSO_SECRET' => $secret_key]);
+        $this->writeToEnvironment(['SSO_SECRET' => $secret_key]);
 
         $this->info("Generated new secret key: $secret_key");
         return 0;
