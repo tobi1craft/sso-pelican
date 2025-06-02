@@ -10,9 +10,11 @@
 		}
 	},
 	// https://github.com/cirolosapio/devcontainers-features/pkgs/container/devcontainers-features
+	/*
 	"features": {
 		"ghcr.io/cirolosapio/devcontainers-features/alpine-php-intl:latest": {}
 	},
+	*/
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "sudo chmod a+x \"$(pwd)\" && sudo rm -rf /var/www/html && sudo ln -s \"$(pwd)\" /var/www/html; if [ -f composer.json ];then composer install;fi"
 }
