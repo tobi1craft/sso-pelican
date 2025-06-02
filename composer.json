@@ -15,9 +15,23 @@
         "php": "^7.3|^8.0",
         "illuminate/support": "^9.0|^10.0|^11.0|^12.0"
     },
+    "require-dev": {
+        "pelican-dev/panel": "dev-main"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/pelican-dev/panel"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "WemX\\Sso\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Pelican\\Panel\\": "vendor/pelican-dev/panel/src/"
         }
     },
     "extra": {
