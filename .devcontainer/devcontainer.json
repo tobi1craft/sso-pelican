@@ -1,20 +1,10 @@
 {
 	"image": "mcr.microsoft.com/devcontainers/php:latest",
-	// Configure tool-specific properties.
 	"customizations": {
-		// Configure properties specific to VS Code.
 		"vscode": {
 			"extensions": [
 				"devsense.composer-php-vscode"
 			]
 		}
-	},
-	// https://github.com/cirolosapio/devcontainers-features/pkgs/container/devcontainers-features
-	/*
-	"features": {
-		"ghcr.io/cirolosapio/devcontainers-features/alpine-php-intl:latest": {}
-	},
-	*/
-	// Use 'postCreateCommand' to run commands after the container is created.
-	//"postCreateCommand": "sudo chmod a+x \"$(pwd)\" && sudo rm -rf /var/www/html && sudo ln -s \"$(pwd)\" /var/www/html; if [ -f composer.json ];then composer install;fi && sudo apt install libicu-dev && docker-php-ext-install intl"
+	}
 }

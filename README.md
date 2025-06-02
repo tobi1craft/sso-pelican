@@ -118,6 +118,14 @@ After being redirected to the /sso route, the user will be automatically authori
 
 If you have any questions or issues, please create a new issue in the project repository on GitHub.
 
+## Contributing
+
+Just clone and install everything using composer. Optionally leave out PHP-Extensions that are not installed.
+
+```bash
+composer install --ignore-platform-req=ext-intl --ignore-platform-req=ext-zip --ignore-platform-req=ext-bcmath
+```
+
 ## License
 
 This project is licensed under the MIT License.
