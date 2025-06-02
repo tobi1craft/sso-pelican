@@ -3,3 +3,5 @@
 .idea/modules.xml
 .idea/sso-pterodactyl.iml
 .idea/workspace.xml
+vendor
+composer.lock
