@@ -1,5 +1,9 @@
 # Pelican SSO
 
+## 🚧 *The goal is to switch to JWTs, it is not ready yet.* 🚧
+
+<br>
+
 Pelican SSO is a package for implementing Single Sign-On (SSO) in [Pelican Panel](https://github.com/pelican-dev/panel/). It allows you to authorize users on a Pelican panel instance from another website.
 
 ## Installation
