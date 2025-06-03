@@ -67,19 +67,13 @@ RUN composer dump-autoload --optimize
 </details>
 
 ## Configuration
-1. Generate new SSO key. A method for this is provided by the package, but you can also generate it manually. <br>The key should be a random string of at least **32** characters.
-
-```shell
-php artisan sso:generate
-```
-
-<br>
+1. Generate new SSO key. The key should be a random string of at least **32** characters.
 
 2. Set the SSO key as an environment variable named `SSO_SECRET`.
 
 ## Usage
 
-1. Generate a access token for using a GET request from your application
+1. Generate an access token by using a GET request from your application
 2. Redirect the user to the SSO redirect with their token
 
 <br>

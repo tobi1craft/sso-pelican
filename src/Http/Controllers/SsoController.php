@@ -39,7 +39,7 @@ class SsoController
         }
 
         try {
-            $id = $this->getToken($token);
+            $id = $this->getUserId($token);
             $user = User::findOrFail($id);
             Auth::loginUsingId($id);
             $this->invalidateToken($token);
@@ -145,43 +145,25 @@ class SsoController
     }
 
     /**
-     * Generate a random access token and store the user_id inside
-     * Tokens are only valid for 60 seconds
-     *
-     * @return mixed
+     * Generate a random access token and link the user_id
      */
-    protected function generateToken($user_id)
+    protected function generateToken($user_id): string
     {
         $token = Str::random(48);
         Cache::add($token, $user_id, 60); // Store the token for 60 seconds
         return $token;
     }
 
-    /**
-     * Returns the value of the token
-     *
-     * @return mixed
-     */
-    protected function getToken($token)
+    protected function getUserId($token): string
     {
         return Cache::get($token);
     }
 
-    /**
-     * Returns true or false based on if the token exists
-     *
-     * @return bool
-     */
     protected function hasToken($token): bool
     {
         return Cache::has($token);
     }
 
-    /**
-     * Invalidates the token so it can no longer be used
-     *
-     * @return void
-     */
     protected static function invalidateToken($token)
     {
         Cache::forget($token);
