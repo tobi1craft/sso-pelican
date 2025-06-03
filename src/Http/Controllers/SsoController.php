@@ -164,7 +164,7 @@ class SsoController
         return Cache::has($token);
     }
 
-    protected static function invalidateToken($token)
+    protected static function invalidateToken($token): void
     {
         Cache::forget($token);
     }
