@@ -3,7 +3,7 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"devsense.composer-php-vscode"
+				"devsense.phptools-vscode"
 			]
 		}
 	}
