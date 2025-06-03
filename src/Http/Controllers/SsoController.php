@@ -27,6 +27,8 @@ use Jose\Component\Signature\JWSTokenSupport;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
+use Tobi1craft\Sso\Checker\SubjectChecker;
+use Tobi1craft\Sso\Checker\UserChecker;
 
 class SsoController
 {
@@ -129,9 +131,8 @@ class SsoController
             new AudienceChecker('https://pelican.tobi1craft.de'),
             new IssuedAtChecker($clock),
             new ExpirationTimeChecker($clock),
-            //TODO:
-            //Subject (sub)
-            //User (user: int)
+            new SubjectChecker(),
+            new UserChecker()
         ]);
         try {
             $claimCheckerManager->check(json_decode($jws->getPayload(), true), ['iss', 'aud', 'iat', 'exp', 'sub', 'user']);
