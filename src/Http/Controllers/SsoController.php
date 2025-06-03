@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tobi1craft\Sso\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
