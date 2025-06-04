@@ -53,6 +53,8 @@ class SsoController
                 return redirect()->intended('/admin');
             }
             return redirect()->intended('/');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return redirect()->back()->withErrors('User not found.');
         } catch (\Exception $error) {
             return redirect()->back()->withErrors('Something went wrong, please try again.');
         }
@@ -71,11 +73,11 @@ class SsoController
             return response(['success' => false, 'message' => 'Please provide valid credentials.'], 403);
         }
 
-        $user = User::findOrFail($request->input('user_id'));
-
-        if($user === null) {
-            return response(['success' => false, 'message' => 'User not found.'], 403);
+        $userId = $request->input('user_id');
+        if (!is_numeric($userId)) {
+            return response(['success' => false, 'message' => 'Invalid user ID.'], 400);
         }
+        $user = User::findOrFail((int)$userId);
 
         if ($user->use_totp) {
             return response(['success' => false, 'message' => 'Logging into accounts with 2 Factor Authentication enabled is not supported.'], 501);
@@ -95,20 +97,22 @@ class SsoController
             return response(['success' => false, 'message' => 'No JWS token provided.'], 400);
         }
 
-        $isValid = $this->validateJWS($token);
-        if ($isValid === true) {
-            return response(['success' => true, 'redirect' => route('sso-tobi1craft.login', $this->generateToken($request->input('user_id')))], 200);
+        $validationResult = $this->validateJWS($token);
+        if (is_array($validationResult)) {
+            $userId = $validationResult['user_id'];
+            return response(['success' => true, 'redirect' => route('sso-tobi1craft.login', $this->generateToken($userId))], 200);
         }
 
-        return $isValid;
+        return $validationResult;
     }
 
     /**
      * Validate the JWS token
      * 
      * @param string $token Compact JWS (header.payload.signature)
+     * @return array|Response Returns array with user_id on success, Response on failure
      */
-    protected function validateJWS(string $token): bool|Response
+    protected function validateJWS(string $token): array|Response
     {
         try {
             // Fetch public key with timeout
@@ -148,12 +152,16 @@ class SsoController
                 return response(['success' => false, 'message' => 'Invalid token payload'], 403);
             }
             
-            $claimCheckerManager->check($payload, ['iss', 'aud', 'iat', 'exp', 'sub', 'user']);
+            $payload = $claimCheckerManager->check($payload, ['iss', 'aud', 'iat', 'exp', 'sub', 'user']);
 
             $jwsVerifier = new JWSVerifier(new AlgorithmManager([new EdDSA()]));
             $isVerified = $jwsVerifier->verifyWithKey($jws, $jwk, 0);
 
-            return $isVerified ? true : response(['success' => false, 'message' => 'Invalid JWS token'], 403);
+            if ($isVerified) {
+                return ['user_id' => $payload['user']];
+            }
+            
+            return response(['success' => false, 'message' => 'Invalid JWS token'], 403);
             
         } catch (\Jose\Component\Checker\InvalidClaimException $e) {
             return response(['success' => false, 'message' => 'Token invalid: ' . $e->getMessage()], 403);
