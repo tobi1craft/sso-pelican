@@ -39,7 +39,7 @@ class SsoController
     public function handle(string $token): RedirectResponse
     {
         if (!$this->hasToken($token)) {
-            return redirect()->back()->withErrors('Token does not exists or has expired');
+            return redirect()->back()->withErrors('Token does not exists or has expired.');
         }
 
         try {
@@ -64,16 +64,20 @@ class SsoController
     public function requestToken(Request $request): Response
     {
         if (!env('SSO_SECRET')) {
-            return response(['success' => false, 'message' => 'Please configure a SSO Secret'], 403);
+            return response(['success' => false, 'message' => 'Please configure a SSO Secret.'], 403);
         }
 
         if ($request->input('sso_secret') !== env('SSO_SECRET')) {
-            return response(['success' => false, 'message' => 'Please provide valid credentials'], 403);
+            return response(['success' => false, 'message' => 'Please provide valid credentials.'], 403);
         }
 
         $user = User::findOrFail($request->input('user_id'));
 
-        if ($user['2fa']) {
+        if($user === null) {
+            return response(['success' => false, 'message' => 'User not found.'], 403);
+        }
+
+        if ($user->use_totp) {
             return response(['success' => false, 'message' => 'Logging into accounts with 2 Factor Authentication enabled is not supported.'], 501);
         }
 
@@ -88,7 +92,7 @@ class SsoController
         $token = $request->getContent();
 
         if (!$token) {
-            return response(['success' => false, 'message' => 'No token provided'], 400);
+            return response(['success' => false, 'message' => 'No JWS token provided.'], 400);
         }
 
         $isValid = $this->validateJWS($token);
@@ -106,45 +110,56 @@ class SsoController
      */
     protected function validateJWS(string $token): bool|Response
     {
-        $jwkJson = file_get_contents('https://www.tobi1craft.de/pelican-token');
-        if (!$jwkJson) {
-            response(['success' => false, 'message' => 'Failed to fetch public key'], 501);
-        }
-        $jwk = JWK::createFromJson($jwkJson);
-
-
-        $serializerManager = new JWSSerializerManager([
-            new CompactSerializer(),
-        ]);
-        $jws = $serializerManager->unserialize($token);
-
-
-        $headerCheckerManager = new HeaderCheckerManager([new AlgorithmChecker(['EdDSA'])], [new JWSTokenSupport()]);
-        $headerCheckerManager->check($jws, 0);
-
-
-        $clock = new WrapperClock(Carbon::now());
-
-
-        $claimCheckerManager = new ClaimCheckerManager([
-            new IssuerChecker(['https://www.tobi1craft.de']),
-            new AudienceChecker('https://pelican.tobi1craft.de'),
-            new IssuedAtChecker($clock),
-            new ExpirationTimeChecker($clock),
-            new SubjectChecker(),
-            new UserChecker()
-        ]);
         try {
-            $claimCheckerManager->check(json_decode($jws->getPayload(), true), ['iss', 'aud', 'iat', 'exp', 'sub', 'user']);
+            // Fetch public key with timeout
+            $context = stream_context_create([
+                'http' => [
+                    'timeout' => 10,
+                    'method' => 'GET'
+                ]
+            ]);
+            $jwkJson = file_get_contents('https://www.tobi1craft.de/pelican-token', false, $context);
+            if (!$jwkJson) {
+                return response(['success' => false, 'message' => 'Failed to fetch public key'], 501);
+            }
+            $jwk = JWK::createFromJson($jwkJson);
+
+            $serializerManager = new JWSSerializerManager([
+                new CompactSerializer(),
+            ]);
+            $jws = $serializerManager->unserialize($token);
+
+            $headerCheckerManager = new HeaderCheckerManager([new AlgorithmChecker(['EdDSA'])], [new JWSTokenSupport()]);
+            $headerCheckerManager->check($jws, 0);
+
+            $clock = new WrapperClock(Carbon::now());
+
+            $claimCheckerManager = new ClaimCheckerManager([
+                new IssuerChecker(['https://www.tobi1craft.de']),
+                new AudienceChecker('https://pelican.tobi1craft.de'),
+                new IssuedAtChecker($clock),
+                new ExpirationTimeChecker($clock),
+                new SubjectChecker(),
+                new UserChecker()
+            ]);
+            
+            $payload = json_decode($jws->getPayload(), true);
+            if (!$payload) {
+                return response(['success' => false, 'message' => 'Invalid token payload'], 403);
+            }
+            
+            $claimCheckerManager->check($payload, ['iss', 'aud', 'iat', 'exp', 'sub', 'user']);
+
+            $jwsVerifier = new JWSVerifier(new AlgorithmManager([new EdDSA()]));
+            $isVerified = $jwsVerifier->verifyWithKey($jws, $jwk, 0);
+
+            return $isVerified ? true : response(['success' => false, 'message' => 'Invalid JWS token'], 403);
+            
+        } catch (\Jose\Component\Checker\InvalidClaimException $e) {
+            return response(['success' => false, 'message' => 'Token invalid: ' . $e->getMessage()], 403);
         } catch (\Exception $e) {
-            return response(['success' => false, 'message' => $e->getMessage()], 403);
+            return response(['success' => false, 'message' => 'Token validation failed: ' . $e->getMessage()], 403);
         }
-
-        $jwsVerifier = new JWSVerifier(new AlgorithmManager([new EdDSA()]));
-        $isVerified = $jwsVerifier->verifyWithKey($jws, $jwk, 0);
-
-
-        return $isVerified ? true : response(['success' => false, 'message' => 'Invalid JWS token'], 403);
     }
 
     /**
