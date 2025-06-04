@@ -36,7 +36,7 @@ class SsoController
     /**
      * Attempt to login the user
      */
-    public function handle($token): RedirectResponse
+    public function handle(string $token): RedirectResponse
     {
         if (!$this->hasToken($token)) {
             return redirect()->back()->withErrors('Token does not exists or has expired');
@@ -44,9 +44,10 @@ class SsoController
 
         try {
             $id = $this->getUserId($token);
+            $this->invalidateToken($token);
+
             $user = User::findOrFail($id);
             Auth::loginUsingId($id);
-            $this->invalidateToken($token);
 
             if ($user->isAdmin()) {
                 return redirect()->intended('/admin');
@@ -84,7 +85,6 @@ class SsoController
      */
     public function requestLogin(Request $request): Response
     {
-        assert($request->isMethod('POST'));
         $token = $request->getContent();
 
         if (!$token) {
@@ -150,24 +150,24 @@ class SsoController
     /**
      * Generate a random access token and link the user_id
      */
-    protected function generateToken($user_id): string
+    protected function generateToken(int $user_id): string
     {
         $token = Str::random(48);
         Cache::add($token, $user_id, 60); // Store the token for 60 seconds
         return $token;
     }
 
-    protected function getUserId($token): string
+    protected function getUserId(string $token): ?int
     {
         return Cache::get($token);
     }
 
-    protected function hasToken($token): bool
+    protected function hasToken(string $token): bool
     {
         return Cache::has($token);
     }
 
-    protected static function invalidateToken($token): void
+    protected static function invalidateToken(string $token): void
     {
         Cache::forget($token);
     }

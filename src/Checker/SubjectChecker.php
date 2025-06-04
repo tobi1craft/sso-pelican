@@ -19,7 +19,7 @@ final class SubjectChecker implements ClaimChecker
             throw new InvalidClaimException('The claim "sub" must be a string.', 'sub', $value);
         }
         if ($value !== 'sso') { // Check if the value is allowed
-            throw new InvalidClaimException('The claim "foo" must be "sso".', 'sub', $value);
+            throw new InvalidClaimException('The claim "sub" must be "sso".', 'sub', $value);
         }
     }
 

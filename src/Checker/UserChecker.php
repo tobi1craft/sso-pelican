@@ -26,7 +26,7 @@ final class UserChecker implements ClaimChecker
         }
 
         if ($user->use_totp) {
-            throw new InvalidClaimException('User has 2FA enabled.', 'user', $value);
+            throw new InvalidClaimException('User has 2FA enabled. Logging into 2FA is not supported!', 'user', $value);
         }
     }
 
