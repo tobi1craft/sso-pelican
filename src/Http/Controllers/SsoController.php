@@ -77,7 +77,7 @@ class SsoController
         if (!is_numeric($userId)) {
             return response(['success' => false, 'message' => 'Invalid user ID.'], 400);
         }
-        $user = User::findOrFail((int)$userId);
+        $user = User::findOrFail((int) $userId);
 
         if ($user->use_totp) {
             return response(['success' => false, 'message' => 'Logging into accounts with 2 Factor Authentication enabled is not supported.'], 501);
@@ -156,17 +156,17 @@ class SsoController
                 new SubjectChecker(),
                 new UserChecker()
             ]);
-            
+
             $payload = json_decode($jws->getPayload(), true);
             if (!$payload) {
                 return response(['success' => false, 'message' => 'Invalid token payload'], 403);
             }
-            
+
             $payload = $claimCheckerManager->check($payload, ['iss', 'aud', 'iat', 'exp', 'sub', 'user']);
 
             // At this point the token is verified and claims are validated
             return ['user_id' => $payload['user']];
-            
+
         } catch (\Jose\Component\Checker\InvalidClaimException $e) {
             return response(['success' => false, 'message' => 'Token invalid: ' . $e->getMessage()], 403);
         } catch (\Exception $e) {

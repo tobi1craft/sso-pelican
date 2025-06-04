@@ -17,7 +17,7 @@ final class UserChecker implements ClaimChecker
     public function checkClaim($value): void
     {
         if (!is_int($value)) {
-            throw new InvalidClaimException('The claim "user" must be an user id (int).', 'user', $value);
+            throw new InvalidClaimException('The claim "user" must be a user id (int).', 'user', $value);
         }
         $user = User::find($value);
 
