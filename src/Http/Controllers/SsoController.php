@@ -115,16 +115,20 @@ class SsoController
     protected function validateJWS(string $token): array|Response
     {
         try {
-            // Fetch public key with timeout
-            $context = stream_context_create([
-                'http' => [
-                    'timeout' => 10,
-                    'method' => 'GET'
-                ]
-            ]);
-            $jwkJson = file_get_contents('https://www.tobi1craft.de/pelican-token', false, $context);
+            // Fetch public key, cached for 1 hour
+            $jwkJson = Cache::get('sso_jwk_json');
             if (!$jwkJson) {
-                return response(['success' => false, 'message' => 'Failed to fetch public key'], 501);
+                $context = stream_context_create([
+                    'http' => [
+                        'timeout' => 10,
+                        'method' => 'GET'
+                    ]
+                ]);
+                $jwkJson = file_get_contents('https://www.tobi1craft.de/pelican-token', false, $context);
+                if (!$jwkJson) {
+                    return response(['success' => false, 'message' => 'Failed to fetch public key'], 501);
+                }
+                Cache::put('sso_jwk_json', $jwkJson, config('app.debug') ? 60 : 3600);
             }
             $jwk = JWK::createFromJson($jwkJson);
 
