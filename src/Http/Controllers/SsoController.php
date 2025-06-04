@@ -140,6 +140,12 @@ class SsoController
             $headerCheckerManager = new HeaderCheckerManager([new AlgorithmChecker(['EdDSA'])], [new JWSTokenSupport()]);
             $headerCheckerManager->check($jws, 0);
 
+            // First verify the signature before trusting claims
+            $jwsVerifier = new JWSVerifier(new AlgorithmManager([new EdDSA()]));
+            if (!$jwsVerifier->verifyWithKey($jws, $jwk, 0)) {
+                return response(['success' => false, 'message' => 'Invalid JWS token'], 403);
+            }
+
             $clock = new WrapperClock(Carbon::now());
 
             $claimCheckerManager = new ClaimCheckerManager([
@@ -158,14 +164,8 @@ class SsoController
             
             $payload = $claimCheckerManager->check($payload, ['iss', 'aud', 'iat', 'exp', 'sub', 'user']);
 
-            $jwsVerifier = new JWSVerifier(new AlgorithmManager([new EdDSA()]));
-            $isVerified = $jwsVerifier->verifyWithKey($jws, $jwk, 0);
-
-            if ($isVerified) {
-                return ['user_id' => $payload['user']];
-            }
-            
-            return response(['success' => false, 'message' => 'Invalid JWS token'], 403);
+            // At this point the token is verified and claims are validated
+            return ['user_id' => $payload['user']];
             
         } catch (\Jose\Component\Checker\InvalidClaimException $e) {
             return response(['success' => false, 'message' => 'Token invalid: ' . $e->getMessage()], 403);
