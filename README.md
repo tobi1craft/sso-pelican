@@ -73,33 +73,68 @@ RUN composer dump-autoload --optimize
 
 ## Usage
 
-1. Generate an access token by using a GET request from your application
+1. Generate an access token by using a GET request from your application.
+    It should contain an `Authorization` header with the signed JWT.
 2. Redirect the user to the SSO redirect with their token
 
 <br>
 
 <details>
-
 <summary>Example in PHP</summary>
 
 ```php
-public function loginPanel()
-{
-    $response = Http::get("https://panel.example.com/generate-token/", [
-        'sso_secret' => "xxxxxxx",
-        'user_id' => 1
-    ]);
+$payload = [
+    'iss' => 'https://www.example.com',
+    'aud' => 'https://pelican.example.com',
+    'iat' => time(),
+    'exp' => time() + 60,
+    'sub' => 'sso',
+    'user' => 1,
+];
 
-    if (!$response->successful()) {
-        $message = $response['success'] && !$response['success']
-            ? $response['message']
-            : 'Something went wrong, please contact an administrator.';
+// Create JWS token (EdDSA signed)
+// Normally use a JWT library of your choice to build and sign the JWT:
+$jws = 'HEADER.' . base64_encode(json_encode($payload)) . '.SIGNATURE';
 
-        return redirect()->back()->withError($message);
-    }
+$response = Http::withToken($jws)->get('https://pelican.example.com/request-sso');
 
-    return redirect()->intended($response['redirect']);
+if (!$response->successful()) {
+    $message = $response['message'] ?? 'Something went wrong, please contact an administrator.';
+    return redirect()->back()->withError($message);
 }
+
+return redirect()->intended($response['redirect']);
+```
+
+</details>
+
+<details>
+<summary>Example in TypeScript using JOSE</summary>
+
+```ts
+  const jws = await new SignJWT({ user: 1 })
+    .setProtectedHeader({ alg: "EdDSA" })
+    .setSubject("sso")
+    .setIssuedAt()
+    .setIssuer("https://ww.example.com")
+    .setAudience("https://pelican.example.com")
+    .setExpirationTime("1 min")
+    .sign(privateKey);
+
+  const response = await fetch("https://pelican.example.com/request-sso", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${jws}`,
+    },
+  });
+
+  const pelicanResponse = (await response.json()) as { message?: string; redirect?: string };
+
+  if (!response.ok) {
+    return new Response(pelicanResponse.message, { status: response.status });
+  }
+
+  return redirect(pelicanResponse.redirect ?? "/", 307);
 ```
 
 </details>

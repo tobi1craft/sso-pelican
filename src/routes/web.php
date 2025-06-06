@@ -7,6 +7,6 @@ use Tobi1craft\Sso\Http\Controllers\SsoController;
 
 Route::middleware(['web'])->group(function (): void {
     Route::get('/request-token', [SsoController::class, 'requestToken']);
-    Route::post('/request-sso', [SsoController::class, 'requestLogin']);
+    Route::get('/request-sso', [SsoController::class, 'requestLogin']);
     Route::get('/sso/{token}', [SsoController::class, 'handle'])->name('sso-tobi1craft.login');
 });

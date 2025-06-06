@@ -91,16 +91,17 @@ class SsoController
      */
     public function requestLogin(Request $request): Response
     {
-        $token = $request->getContent();
+        // Retrieve JWS token from Authorization: Bearer header
+        $token = $request->bearerToken();
 
         if (!$token) {
-            return response(['success' => false, 'message' => 'No JWS token provided.'], 400);
+            return response(['message' => 'No JWS token provided in Authorization header.'], 400);
         }
 
         $validationResult = $this->validateJWS($token);
         if (is_array($validationResult)) {
             $userId = $validationResult['user_id'];
-            return response(['success' => true, 'redirect' => route('sso-tobi1craft.login', $this->generateToken($userId))], 200);
+            return response(['redirect' => route('sso-tobi1craft.login', $this->generateToken($userId))], 200);
         }
 
         return $validationResult;
@@ -126,7 +127,7 @@ class SsoController
                 ]);
                 $jwkJson = file_get_contents('https://www.tobi1craft.de/pelican-token', false, $context);
                 if (!$jwkJson) {
-                    return response(['success' => false, 'message' => 'Failed to fetch public key'], 501);
+                    return response(['message' => 'Failed to fetch public key'], 501);
                 }
                 Cache::put('sso_jwk_json', $jwkJson, config('app.debug') ? 60 : 3600);
             }
@@ -143,7 +144,7 @@ class SsoController
             // First verify the signature before trusting claims
             $jwsVerifier = new JWSVerifier(new AlgorithmManager([new EdDSA()]));
             if (!$jwsVerifier->verifyWithKey($jws, $jwk, 0)) {
-                return response(['success' => false, 'message' => 'Invalid JWS token'], 403);
+                return response(['message' => 'Invalid JWS token'], 403);
             }
 
             $clock = new WrapperClock(Carbon::now());
@@ -159,7 +160,7 @@ class SsoController
 
             $payload = json_decode($jws->getPayload(), true);
             if (!$payload) {
-                return response(['success' => false, 'message' => 'Invalid token payload'], 403);
+                return response(['message' => 'Invalid token payload'], 403);
             }
 
             $payload = $claimCheckerManager->check($payload, ['iss', 'aud', 'iat', 'exp', 'sub', 'user']);
@@ -168,9 +169,9 @@ class SsoController
             return ['user_id' => $payload['user']];
 
         } catch (\Jose\Component\Checker\InvalidClaimException $e) {
-            return response(['success' => false, 'message' => 'Token invalid: ' . $e->getMessage()], 403);
+            return response(['message' => 'Token invalid: ' . $e->getMessage()], 403);
         } catch (\Exception $e) {
-            return response(['success' => false, 'message' => 'Token validation failed: ' . $e->getMessage()], 403);
+            return response(['message' => 'Token validation failed: ' . $e->getMessage()], 403);
         }
     }
 
