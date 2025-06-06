@@ -18,7 +18,7 @@ final class SubjectChecker implements ClaimChecker
         if (!is_string($value)) {
             throw new InvalidClaimException('The claim "sub" must be a string.', 'sub', $value);
         }
-        if ($value !== 'sso') { // Check if the value is allowed
+        if ($value !== 'sso') {
             throw new InvalidClaimException('The claim "sub" must be "sso".', 'sub', $value);
         }
     }
@@ -28,6 +28,6 @@ final class SubjectChecker implements ClaimChecker
      */
     public function supportedClaim(): string
     {
-        return 'sub'; //The claim to check.
+        return 'sub';
     }
 }

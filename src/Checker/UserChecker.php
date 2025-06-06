@@ -35,6 +35,6 @@ final class UserChecker implements ClaimChecker
      */
     public function supportedClaim(): string
     {
-        return 'user'; //The claim to check.
+        return 'user';
     }
 }
