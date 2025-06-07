@@ -12,6 +12,12 @@
 - 🛡️ **Built-in security** with token expiration and validation
 - 📱 **Framework agnostic** client implementation (works with any language)
 
+## WIP Features
+
+- [ ] 🔑 **JWKS support** for public key distribution
+- [ ] 🔧 **Different algorithm support** beyond EdDSA
+- [ ] ⚙️ **Configurable** settings and validation rules
+
 ## Installation
 
 ### Via Composer (Recommended)
