@@ -53,8 +53,6 @@ WORKDIR /var/www/html
 RUN composer config repositories.sso-pelican vcs https://github.com/tobi1craft/sso-pelican.git \
     && composer require tobi1craft/sso-pelican:dev-main \
     && composer dump-autoload --optimize
-
-USER 1001
 ```
 </details>
 

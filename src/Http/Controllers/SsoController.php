@@ -132,7 +132,7 @@ class SsoController
             // Fetch public key, cached for 1 hour
             $jwkJson = Cache::get('sso_jwk_json');
             if (!$jwkJson) {
-                $response = Http::timeout(10)->get('https://www.tobi1craft.de/pelican-token');
+                $response = Http::timeout(10)->get('https://www.tobi1craft.de/api/pelican-token');
                 if ($response->failed()) {
                     return response()->json(['message' => 'Failed to fetch public key'], 501);
                 }
