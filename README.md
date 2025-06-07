@@ -16,7 +16,6 @@
 
 - [ ] 🔑 **JWKS support** for public key distribution
 - [ ] 🔧 **Different algorithm support** beyond EdDSA
-- [ ] ⚙️ **Configurable** settings and validation rules
 
 ## Installation
 
@@ -32,9 +31,28 @@ composer config repositories.sso-pelican vcs https://github.com/tobi1craft/sso-p
 composer require tobi1craft/sso-pelican:dev-main
 ```
 
-3. **Optimize autoloader** (optional but recommended):
+3. **Publish the configuration**:
+```bash
+&& php artisan vendor:publish --tag=sso
+```
+
+4. **Configure**:
+   - Change the published configuration file at `config/sso.php` or set these environment variables:
+
+```env
+SSO_ISSUER: "https://your-app.example.com"
+SSO_AUDIENCE: "https://pelican.example.com" # Can be left empty to use the default Pelican Panel URL (APP_URL)
+SSO_PUBLIC_KEY_ENDPOINT: "https://your-app.example.com/api/pelican-token"
+```
+
+
+5. **Optimize** (optional but recommended):
 ```bash
 composer dump-autoload --optimize
+php artisan route:cache
+php artisan view:cache
+php artisan event:cache
+php artisan config:cache # config changes won't take effect after this (Environment Variables are still working)
 ```
 
 <details>
@@ -58,7 +76,12 @@ WORKDIR /var/www/html
 # Install Pelican SSO package
 RUN composer config repositories.sso-pelican vcs https://github.com/tobi1craft/sso-pelican.git \
     && composer require tobi1craft/sso-pelican:dev-main \
-    && composer dump-autoload --optimize
+    && php artisan vendor:publish --tag=sso \
+    && composer dump-autoload --optimize \
+    && php artisan route:cache \
+    && php artisan view:cache \
+    && php artisan event:cache \
+    && php artisan config:cache
 ```
 </details>
 

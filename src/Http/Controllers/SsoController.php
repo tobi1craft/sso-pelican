@@ -9,7 +9,6 @@ use Carbon\WrapperClock;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -105,7 +104,7 @@ class SsoController
             // Fetch public key, cached for 1 hour
             $jwkJson = Cache::get('sso_jwk_json');
             if (!$jwkJson) {
-                $response = Http::timeout(10)->get('https://www.tobi1craft.de/api/pelican-token');
+                $response = Http::timeout(10)->get(config('sso.public_key_endpoint'));
                 if ($response->failed()) {
                     return response()->json(['message' => 'Failed to fetch public key'], 501);
                 }
@@ -133,8 +132,8 @@ class SsoController
             $clock = new WrapperClock(Carbon::now());
 
             $claimCheckerManager = new ClaimCheckerManager([
-                new IssuerChecker(['https://www.tobi1craft.de']),
-                new AudienceChecker('https://pelican.tobi1craft.de'),
+                new IssuerChecker([config('sso.issuer')]),
+                new AudienceChecker(config('sso.audience')),
                 new IssuedAtChecker($clock),
                 new ExpirationTimeChecker($clock),
                 new SubjectChecker(),
