@@ -69,33 +69,6 @@ class SsoController
     }
 
     /**
-     * @deprecated Previous authentication method, use JWS instead.
-     * Don't change this anymore, it will be removed in the future.
-     */
-    public function requestToken(Request $request): Response
-    {
-        if (!env('SSO_SECRET')) {
-            return response(['success' => false, 'message' => 'Please configure a SSO Secret.'], 403);
-        }
-
-        if ($request->input('sso_secret') !== env('SSO_SECRET')) {
-            return response(['success' => false, 'message' => 'Please provide valid credentials.'], 403);
-        }
-
-        $userId = $request->input('user_id');
-        if (!is_numeric($userId)) {
-            return response(['success' => false, 'message' => 'Invalid user ID.'], 400);
-        }
-        $user = User::findOrFail((int) $userId);
-
-        if ($user->use_totp) {
-            return response(['success' => false, 'message' => 'Logging into accounts with 2 Factor Authentication enabled is not supported.'], 501);
-        }
-
-        return response(['success' => true, 'redirect' => route('sso-tobi1craft.login', $this->generateToken($request->input('user_id')))], 200);
-    }
-
-    /**
      * Request login via JWS token
      * 
      * @param Request $request
