@@ -52,7 +52,6 @@ composer dump-autoload --optimize
 php artisan route:cache
 php artisan view:cache
 php artisan event:cache
-php artisan config:cache # config changes won't take effect after this (Environment Variables are still working)
 ```
 
 <details>
@@ -80,8 +79,7 @@ RUN composer config repositories.sso-pelican vcs https://github.com/tobi1craft/s
     && composer dump-autoload --optimize \
     && php artisan route:cache \
     && php artisan view:cache \
-    && php artisan event:cache \
-    && php artisan config:cache
+    && php artisan event:cache
 ```
 </details>
 
