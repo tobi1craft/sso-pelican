@@ -80,6 +80,8 @@ RUN composer config repositories.sso-pelican vcs https://github.com/tobi1craft/s
     && php artisan route:cache \
     && php artisan view:cache \
     && php artisan event:cache
+
+USER www-data
 ```
 </details>
 
