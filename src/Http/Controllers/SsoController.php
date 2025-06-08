@@ -170,7 +170,7 @@ class SsoController
     protected function generateToken(int $user_id): string
     {
         $token = Str::random(48);
-        Cache::add($token, $user_id, 60); // Store the token for 60 seconds
+        Cache::put($token, $user_id, 60); // Store the token for 60 seconds
         return $token;
     }
 
