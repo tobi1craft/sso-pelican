@@ -15,6 +15,7 @@
 ## WIP Features
 
 - [ ] 🔑 **JWKS support** for public key distribution
+- [ ] 🔄 **Refetch cached key** if signature is invalid
 - [ ] 🔧 **Different algorithm support** beyond EdDSA
 
 ## Installation
