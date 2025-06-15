@@ -182,6 +182,7 @@ class SsoController
      */
     protected function pullUserId(string $token): ?int
     {
-        return Cache::pull($token);
+        $userId = Cache::pull($token);
+        return is_numeric($userId) ? (int) $userId : null;
     }
 }
