@@ -82,6 +82,10 @@ RUN composer config repositories.sso-pelican vcs https://github.com/tobi1craft/s
     && php artisan view:cache \
     && php artisan event:cache
 
+# Update permissions (partly copied from the original Dockerfile)
+RUN chown -R www-data:www-data /pelican-data ./storage ./bootstrap/cache /var/run/supervisord /var/www/html/public/storage \
+    && chmod -R u+rwX,g+rwX,o-rwx /pelican-data ./storage ./bootstrap/cache /var/run/supervisord
+
 USER www-data
 ```
 </details>
