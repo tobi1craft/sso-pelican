@@ -1,6 +1,6 @@
 # Pelican SSO
 
-> ⚠️ **Work in Progress:** This package is currently under development and is not production-ready yet.
+> ⚠️ **Work in Progress:** This package is currently under development and could include performance or security issues.
 
 **Pelican SSO** is a secure Single Sign-On (SSO) package for [Pelican Panel](https://github.com/pelican-dev/panel/) that enables seamless user authentication across multiple applications. Using JWT (JSON Web Tokens) with EdDSA signatures, it provides a modern and secure way to authorize users on your Pelican Panel instance from external websites.
 
@@ -261,7 +261,7 @@ APP_DEBUG=true
 
 ## Support
 
-If you have any questions or issues, please create a new issue in the project repository on GitHub.
+If you have any questions or problems, you are welcome to open a new issue on GitHub.
 
 ## Contributing
 
@@ -274,14 +274,3 @@ composer install --ignore-platform-req=ext-intl --ignore-platform-req=ext-zip --
 ## License
 
 This project is licensed under the [MIT License](LICENSE) - see the LICENSE file for details.
-
-## Acknowledgments
-
-- [Pelican Panel](https://github.com/pelican-dev/panel/) for the amazing game server management platform
-- [web-token/jwt-library](https://github.com/web-token/jwt-library) for secure JWT implementation
-
----
-
-<div align="center">
-  Made with ❤️ by <a href="https://github.com/tobi1craft">tobi1craft</a>
-</div>
