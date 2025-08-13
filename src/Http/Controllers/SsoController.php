@@ -57,7 +57,7 @@ class SsoController
             if ($user->isAdmin()) {
                 return redirect()->intended('/admin');
             }
-            return redirect()->intended('/');
+            return redirect()->intended('/?activeTab=all');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::warning('User not found during SSO login', ['user_id' => $id]);
             return redirect()->back()->withErrors('User not found.');
