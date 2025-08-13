@@ -65,7 +65,7 @@ FROM ghcr.io/pelican-dev/panel:latest
 USER root
 
 # Install system dependencies
-RUN apk add --no-cache curl git unzip
+RUN apk add --no-cache curl git unzip fcgiwrap
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer \
